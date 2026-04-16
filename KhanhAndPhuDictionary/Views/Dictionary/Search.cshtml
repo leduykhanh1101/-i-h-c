@@ -1,0 +1,107 @@
+@model KhanhAndPhuDictionary.Models.DictionaryResponse
+
+@{ Layout = "_Layout"; }
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-[#fcfcff] min-h-screen">
+    <nav class="flex mb-8 text-sm text-gray-500 gap-2 items-center">
+        <a href="/" class="hover:text-violet-600 transition-colors">Home</a>
+        <i class="bi bi-chevron-right text-[10px]"></i>
+        <span class="text-slate-900 font-medium">@Model.Word</span>
+    </nav>
+
+    <div class="grid grid-cols-12 gap-8">
+        <div class="col-span-12 lg:col-span-8 space-y-8">
+            <div class="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative z-10">
+                    <div>
+                        <div class="flex items-center gap-4 mb-2">
+                            <h1 class="text-5xl font-extrabold text-slate-900 tracking-tight capitalize">@Model.Word</h1>
+                            @if (Model.Meanings.Any()) {
+                                <span class="text-violet-600 font-bold italic text-lg">@Model.Meanings.First().PartOfSpeech</span>
+                            }
+                        </div>
+                        <p class="text-slate-400 text-2xl font-medium font-serif">@Model.Phonetic</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        @if (Model.Phonetics?.Any(p => !string.IsNullOrEmpty(p.Audio)) == true) {
+                            <button onclick="document.getElementById('audio-player').play()"
+                                    class="flex items-center gap-2 bg-violet-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-violet-100">
+                                <i class="bi bi-volume-up-fill text-xl"></i>
+                                <span>Listen</span>
+                                <audio id="audio-player" src="@Model.Phonetics.First(p => !string.IsNullOrEmpty(p.Audio)).Audio"></audio>
+                            </button>
+                        }
+    
+                        <button id="btnFavorite" onclick="toggleFavorite('@Model.Word')"
+                                class="w-12 h-12 flex items-center justify-center border-2 rounded-xl transition-all 
+                                @(ViewBag.IsSaved == true ? "bg-violet-100 text-violet-600 border-violet-200" : "border-slate-100 text-slate-400 hover:bg-slate-50")">
+                            <i id="heartIcon" class="bi bi-bookmark-fill"></i>
+                        </button>
+
+                        <button class="w-12 h-12 flex items-center justify-center border-2 border-slate-100 text-slate-400 rounded-xl hover:bg-slate-50 hover:text-violet-600 transition-all">
+                            <i class="bi bi-share-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100">
+                @foreach (var meaning in Model.Meanings) {
+                    <div class="mb-10 last:mb-0">
+                        <div class="flex items-center gap-4 mb-8">
+                            <span class="text-slate-300 font-black text-3xl">/</span>
+                            <h3 class="font-black text-xl text-slate-900 italic">@meaning.PartOfSpeech</h3>
+                            <div class="h-[1px] flex-grow bg-slate-100"></div>
+                        </div>
+                        <div class="space-y-8">
+                            @for (int i = 0; i < meaning.Definitions.Count; i++) {
+                                var def = meaning.Definitions[i];
+                                <div class="flex gap-6">
+                                    <span class="text-violet-600 font-black text-xl">@(i + 1).</span>
+                                    <div class="space-y-3">
+                                        <p class="text-slate-700 text-xl leading-relaxed font-medium">@def.DefinitionText</p>
+                                        @if (!string.IsNullOrEmpty(def.Example)) {
+                                            <div class="bg-slate-50/50 p-4 rounded-2xl border-l-4 border-violet-200">
+                                                <p class="text-slate-500 italic">"@def.Example"</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFavorite(wordValue) {
+    fetch('/Dictionary/ToggleFavorite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `word=${encodeURIComponent(wordValue)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const btn = document.getElementById('btnFavorite');
+            if (data.isFavorite) {
+                btn.classList.add('bg-violet-100', 'text-violet-600', 'border-violet-200');
+                btn.classList.remove('text-slate-400', 'border-slate-100');
+            } else {
+                btn.classList.remove('bg-violet-100', 'text-violet-600', 'border-violet-200');
+                btn.classList.add('text-slate-400', 'border-slate-100');
+            }
+        } else {
+            alert(data.message);
+            if(data.message.includes("đăng nhập")) window.location.href = "/Account/Login";
+        }
+    });
+}
+</script>
