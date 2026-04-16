@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .hero-gradient {
+        background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
+    }
+    .hover-scale { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .hover-scale:hover { transform: translateY(-4px); }
+</style>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <div class="hero-gradient rounded-[2.5rem] py-16 px-6 sm:px-12 text-center text-white relative overflow-hidden shadow-2xl shadow-indigo-200">
+        <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-64 h-64 bg-indigo-400/20 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
+
+        <div class="relative z-10">
+            <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 tracking-tight">Define Your World</h1>
+            <p class="text-indigo-100 text-lg sm:text-xl mb-10 max-w-2xl mx-auto opacity-90">
+                Search millions of words, definitions, and synonyms instantly.
+            </p>
+
+            <form asp-controller="Dictionary" asp-action="Search" method="get" class="max-w-2xl mx-auto relative group">
+                <div class="relative flex items-center">
+                    <i class="bi bi-search absolute left-6 text-gray-400 text-lg"></i>
+                    <input type="text" name="word" 
+                           class="w-full pl-14 pr-36 py-5 rounded-2xl border-none focus:ring-4 focus:ring-indigo-300 text-gray-900 text-lg shadow-xl transition-all outline-none" 
+                           placeholder="Type a word...">
+                    
+                    <button type="submit" 
+                            class="absolute right-2 top-2 bottom-2 bg-indigo-700 hover:bg-indigo-900 text-white px-8 rounded-xl font-bold transition-all flex items-center gap-2 group-hover:px-10">
+                        Search <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
